@@ -1,0 +1,7 @@
+name = Drupal MPME
+description = Start with only a few modules enabled (minimal + admin_menu + features).
+core = 7.x
+dependencies[] = block
+dependencies[] = dblog
+dependencies[] = admin_menu
+dependencies[] = features

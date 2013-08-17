@@ -1,0 +1,16 @@
+diff --git a/entity_dependency.core.inc b/entity_dependency.core.inc
+index 6b94bc9..d7520bf 100644
+--- a/entity_dependency.core.inc
++++ b/entity_dependency.core.inc
+@@ -134,10 +134,7 @@ function user_reference_field_entity_dependencies($entity_type, $entity, $field,
+  */
+ function entityreference_field_entity_dependencies($entity_type, $entity, $field, $instance, $langcode, $items) {
+   $dependencies = array();
+-  foreach ($items as $item) {
+-    $info = entity_get_info($item['target_type']);
+-    entity_dependency_add($dependencies, $item, $item['target_type'], $info['entity keys']['id']);
+-  }
++  entity_dependency_add($dependencies, $items, $field['settings']['target_type'], 'target_id');
+   return $dependencies;
+ }
+ 

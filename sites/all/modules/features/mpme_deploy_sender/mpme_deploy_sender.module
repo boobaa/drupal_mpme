@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Drupal MPME Deploy Sender feature.
+ */
+
+include_once 'mpme_deploy_sender.features.inc';

@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the DH2012 UUID Features feature.
+ */
+
+include_once 'dh2012_uuid_features.features.inc';

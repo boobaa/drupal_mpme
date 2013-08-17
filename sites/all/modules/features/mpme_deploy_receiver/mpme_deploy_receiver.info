@@ -1,0 +1,13 @@
+name = Drupal MPME Deploy Receiver
+core = 7.x
+package = Drupal MPME
+php = 5.2.4
+version = 7.x-1.0-20121122dev1
+project = mpme_deploy_receiver
+dependencies[] = ctools
+dependencies[] = rest_server
+dependencies[] = services
+dependencies[] = uuid_services
+features[ctools][] = services:services:3
+features[features_api][] = api:1
+features[services_endpoint][] = mydeploy_receiver

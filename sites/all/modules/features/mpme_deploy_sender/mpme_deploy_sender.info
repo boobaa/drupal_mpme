@@ -1,0 +1,14 @@
+name = Drupal MPME Deploy Sender
+core = 7.x
+package = Drupal MPME
+php = 5.2.4
+version = 7.x-1.0-20121122dev2
+project = mpme_deploy_sender
+dependencies[] = ctools
+dependencies[] = deploy
+dependencies[] = deploy_ui
+features[ctools][] = deploy:deploy_endpoints:1
+features[ctools][] = deploy:deploy_plans:1
+features[deploy_endpoints][] = my_deploy_sender
+features[deploy_plans][] = mydeploy_plan
+features[features_api][] = api:1

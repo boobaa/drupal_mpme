@@ -1,0 +1,4 @@
+name = My DH2012 Demo module
+description = Provides a simple page callback.
+core = 7.x
+package = DH2012

@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Drupal MPME Content Types feature.
+ */
+
+include_once 'mpme_cts.features.inc';

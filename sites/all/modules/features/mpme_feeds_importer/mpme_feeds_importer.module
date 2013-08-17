@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Drupal MPME Feeds importer feature.
+ */
+
+include_once 'mpme_feeds_importer.features.inc';

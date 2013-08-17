@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the DH2012 Node Export feature.
+ */
+
+include_once 'dh2012_node_export.features.inc';

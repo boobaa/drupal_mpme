@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * My DH2012 Demo module; provides a simple page callback.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function mymodule_menu() {
+  $items = array();
+  $items['admin/content/mymodule'] = array(
+    'title' => 'Mymodule demo',
+    'description' => 'Demo content provided by mymodule.',
+    'page callback' => 'mymodule_demo_page',
+    'access callback' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'mymodule.pages.inc',
+  );
+  return $items;
+}

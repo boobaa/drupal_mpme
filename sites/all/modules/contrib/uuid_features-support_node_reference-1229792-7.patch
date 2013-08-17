@@ -1,0 +1,208 @@
+diff --git a/includes/modules/node_reference.inc b/includes/modules/node_reference.inc
+new file mode 100644
+index 0000000..319f18d
+--- /dev/null
++++ b/includes/modules/node_reference.inc
+@@ -0,0 +1,84 @@
++<?php
++/**
++ * @file
++ * uuid_node hooks on behalf of the node_reference module.
++ */
++
++/**
++ * Implements hook_uuid_node_features_export_render().
++ */
++function node_reference_uuid_node_features_export_alter(&$export, &$pipe, $node) {
++  $fields = uuid_features_find_module_fields(array('node_reference'), $node);
++  foreach ($fields as $field_name => $field) {
++    // Loop through all values of the field.
++    foreach ($field as $lang => $instances) {
++      foreach ($instances as $instance) {
++        if (!empty($instance['nid'])) {
++          $uuid = node_reference_uuid_find($instance['nid']);
++          if ($uuid) {
++            $pipe['uuid_node'][$uuid] = $uuid;
++          }
++        }
++      }
++    }
++  }
++}
++
++/**
++ * Implements hook_uuid_node_features_export_render_alter().
++ */
++function node_reference_uuid_node_features_export_render_alter(&$export, $node, $module) {
++  $fields = uuid_features_find_module_fields(array('node_reference'), $node);
++  foreach ($fields as $field_name => $field) {
++    // Loop through all values of the field.
++    foreach ($field as $lang => $instances) {
++      // Loop through all values of the field.
++      foreach ($instances as $delta => $instance) {
++        if (!empty($instance['nid'])) {
++          $uuid = node_reference_uuid_find($instance['nid']);
++          if (!empty($uuid)) {
++            $export->{$field_name}[$lang][$delta] = array('uuid' => $uuid);
++          }
++          else {
++            unset($export->{$field_name}[$lang][$delta]);
++          }
++        }
++      }
++    }
++  }
++}
++
++/**
++ * Implements hook_uuid_node_features_rebuild_alter().
++ * Replace noderef uuid's with a field array suitable for node_save().
++ */
++function node_reference_uuid_node_features_rebuild_alter(&$node, $module) {
++  $fields = uuid_features_find_module_fields(array('node_reference'), $node);
++  foreach ($fields as $field_name => $field) {
++    // Loop through all values of the field.
++    foreach ($field as $lang => $instances) {
++      // Loop through all values of the field.
++      foreach ($instances as $delta => $instance) {
++        $nid = uuid_node_find($instance['uuid']);
++        if (!empty($nid)) {
++          $node->{$field_name}[$lang][$delta] = array('nid' => $nid);
++        }
++        else {
++          // Unset this instance to avoid any damage it might do.
++          // This means that the feature might require more than one rebuild
++          // to be complete, but it is way to hard to take ordering of nodes and
++          // circular dependencies into account.
++          unset($node->{$field_name}[$lang][$delta]);
++        }
++      }
++    }
++  }
++}
++
++function node_reference_uuid_find($nid) {
++  return db_select('node', 'n')
++    ->fields('n', array('uuid'))
++    ->condition('nid', $nid)
++    ->execute()
++    ->fetchField();
++}
+\ No newline at end of file
+diff --git a/includes/modules/nodereference.inc b/includes/modules/nodereference.inc
+deleted file mode 100644
+index c6e8870..0000000
+--- a/includes/modules/nodereference.inc
++++ /dev/null
+@@ -1,83 +0,0 @@
+-<?php
+-/**
+- * @file
+- * uuid_node hooks on behalf of the nodereference module.
+- */
+-
+-/**
+- * Implements hook_uuid_node_features_export_render().
+- */
+-function nodereference_uuid_node_features_export_alter(&$export, &$pipe, $node) {
+-  $types = content_types();
+-  if (!empty($types[$node->type])) {
+-    // Find CCK nodereference fields.
+-    foreach ($types[$node->type]['fields'] as $field) {
+-      if ($field['module'] == 'nodereference') {
+-        $field_name = $field['field_name'];
+-
+-        // If the content type has changed since the last export, this field
+-        // may not exist.
+-        if (isset($node->$field_name)) {
+-          // Loop through all values of the field.
+-          foreach ($node->$field_name as $delta => $data) {
+-            if (!empty($data['nid'])) {
+-              $uuid = uuid_get_uuid('node', 'nid', $data['nid']);
+-              // If the referenced node doesn't have a uuid, take this opportunity to
+-              // create one.
+-              if (empty($uuid)) {
+-                $uuid = uuid_set_uuid('node', 'nid', $data['nid']);
+-              }
+-              $pipe['uuid_node'][$uuid] = $uuid;
+-            }
+-          }
+-        }
+-      }
+-    }
+-  }
+-}
+-
+-/**
+- * Implements hook_uuid_node_features_export_render_alter().
+- */
+-function nodereference_uuid_node_features_export_render_alter(&$export, $node, $module) {
+-  $types = content_types();
+-  if (!empty($types[$node->type])) {
+-    // Find CCK nodereference fields.
+-    foreach ($types[$node->type]['fields'] as $field) {
+-      if ($field['module'] == 'nodereference') {
+-        $field_name = $field['field_name'];
+-        $export->$field_name = array();
+-
+-        // Loop through all values of the field.
+-        foreach ($node->$field_name as $delta => $data) {
+-          if (!empty($data['nid'])) {
+-            $uuid = uuid_get_uuid('node', 'nid', $data['nid']);
+-            $export->{$field_name}[$delta] = $uuid;
+-          }
+-        }
+-      }
+-    }
+-  }
+-}
+-
+-/**
+- * Implements hook_uuid_node_features_rebuild_alter().
+- * Replace noderef uuid's with a field array suitable for node_save().
+- */
+-function nodereference_uuid_node_features_rebuild_alter(&$node, $module) {
+-  $types = content_types();
+-  if (!empty($types[$node->type])) {
+-    // Find CCK nodereference fields.
+-    foreach ($types[$node->type]['fields'] as $field) {
+-      if ($field['module'] == 'nodereference') {
+-        $field_name = $field['field_name'];
+-
+-        // Loop through all values of the field.
+-        foreach ($node->$field_name as $delta => $uuid) {
+-          $nid = uuid_get_serial_id('node', 'nid', $uuid);
+-          $node->{$field_name}[$delta] = array('nid' => $nid);
+-        }
+-      }
+-    }
+-  }
+-}
+diff --git a/uuid_features.module b/uuid_features.module
+index c5f44b8..dffd04f 100644
+--- a/uuid_features.module
++++ b/uuid_features.module
+@@ -69,3 +69,23 @@ function uuid_features_features_pipe_taxonomy_alter($pipe, $data, $export) {
+     $pipe['uuid_term'] = $export['features']['uuid_term'];
+   }
+ }
++
++/**
++ * Find a field of a particular type on an entity.
++ * @param array $module
++ *   the modules the matching fields belongs to.
++ * @param $entity the entity in which the field might exist.
++ */
++function uuid_features_find_module_fields($modules, $entity) {
++  $fields = field_info_fields();
++  $matching_fields = array();
++  if (!is_array($modules)) {
++    $modules = array($modules);
++  }
++  foreach ($fields as $field_name => $field) {
++    if (in_array($field['module'], $modules) && isset($entity->{$field_name})) {
++      $matching_fields[$field_name] = $entity->{$field_name};
++    }
++  }
++  return $matching_fields;
++}

@@ -1,0 +1,15 @@
+name = Drupal MPME Feeds importer
+description = Import Drupal MPME page nodes via Feeds.
+core = 7.x
+package = Drupal MPME
+version = 7.x-1.0-20130817dev1
+project = mpme_feeds_importer
+dependencies[] = ctools
+dependencies[] = feeds
+dependencies[] = feeds_tamper
+dependencies[] = feeds_xpathparser
+features[ctools][] = feeds:feeds_importer_default:1
+features[ctools][] = feeds_tamper:feeds_tamper_default:2
+features[features_api][] = api:2
+features[feeds_importer][] = page_nodes_importer
+features[feeds_tamper][] = page_nodes_importer-xpathparser_6-explode
